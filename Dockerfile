@@ -104,9 +104,19 @@ COPY --from=build /app/tmp /app/nango
 
 ARG git_hash
 
-ENV PORT=8080
+# === FIX 1: CORRECT PORT CONFIGURATION ===
+ENV PORT=3003
+ENV NANGO_SERVER_PORT=3003
 ENV NODE_ENV=production
 ENV GIT_HASH=$git_hash
 ENV SERVER_RUN_MODE=DOCKERIZED
 
-EXPOSE 8080
+# === FIX 2: EXPOSE CORRECT PORT ===
+EXPOSE 3003
+
+# === FIX 3: ADD HEALTH CHECK FOR RENDER ===
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:3003/health || exit 1
+
+# === FIX 4: CLEAR START COMMAND ===
+CMD ["node", "packages/server/dist/index.js"]
