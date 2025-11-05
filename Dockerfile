@@ -11,6 +11,7 @@ RUN jq '. | del(.references[] | select(.path == "packages/cli"))' tsconfig.build
 # ------------------
 FROM node:22.17.1-bookworm-slim AS build
 
+
 # Setup the app WORKDIR
 WORKDIR /app/tmp
 
@@ -98,23 +99,14 @@ RUN true \
 WORKDIR /app/nango
 
 # Code
+# COPY --from=build --chown=node:node /app/tmp /app/nango
 COPY --from=build /app/tmp /app/nango
 
 ARG git_hash
 
-# === FIXED: CORRECT PORT CONFIGURATION ===
-ENV PORT=3003
-ENV NANGO_SERVER_PORT=3003
+ENV PORT=8080
 ENV NODE_ENV=production
 ENV GIT_HASH=$git_hash
 ENV SERVER_RUN_MODE=DOCKERIZED
 
-# === FIXED: EXPOSE CORRECT PORT ===
-EXPOSE 3003
-
-# === FIXED: ADD HEALTH CHECK FOR RENDER ===
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:3003/health || exit 1
-
-# === FIXED: CORRECT START COMMAND (ABSOLUTE PATH) ===
-CMD ["/usr/local/bin/node", "/app/nango/packages/server/dist/index.js"]
+EXPOSE 8080
