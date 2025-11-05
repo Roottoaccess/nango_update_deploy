@@ -1,0 +1,16 @@
+node_modules
+.git
+.github
+nango-data
+*.log
+.DS_Store
+.env.local
+.env.*.local
+coverage
+.nyc_output
+dist
+build
+*.swp
+*.swo
+*~
+
