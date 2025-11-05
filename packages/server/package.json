@@ -7,7 +7,6 @@
     "typings": "dist/index.d.ts",
     "private": true,
     "scripts": {
-        "prebuild": "npm install typescript --save-dev",
         "build": "tsc",
         "start": "tsc && node dist/server.js",
         "dev": "nodemon",
