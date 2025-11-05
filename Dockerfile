@@ -11,7 +11,6 @@ RUN jq '. | del(.references[] | select(.path == "packages/cli"))' tsconfig.build
 # ------------------
 FROM node:22.17.1-bookworm-slim AS build
 
-
 # Setup the app WORKDIR
 WORKDIR /app/tmp
 
@@ -59,9 +58,6 @@ COPY . /app/tmp
 RUN true \
   && npm run ts-build:docker
 
-# /!\ Do not set NODE_ENV=production before building, it will break some modules
-# ENV NODE_ENV=production
-
 # Build the frontend
 RUN true \
   && npm run -w @nangohq/webapp build \
@@ -70,7 +66,6 @@ RUN true \
 # Clean src
 RUN true \
   && rm -rf packages/*/src \
-  # && rm -rf packages/*/lib will break database migrations because they are not compiled; barely saves a few MBs
   && rm -rf packages/*/public
 
 # Clean dev dependencies
@@ -84,31 +79,28 @@ FROM node:22.17.1-bookworm-slim AS web
 # Install a more recent npm
 RUN npm install -g npm@10.9.2
 
-# - Bash is just to be able to log inside the image and have a decent shell
+# Install bash and CA certificates
 RUN true \
   && apt update && apt-get install -y bash ca-certificates \
   && update-ca-certificates \
   && rm -rf /var/lib/apt/lists/* \
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false
 
-# Do not use root to run the app
-# BUT it does not work with secret mount (could not find a solution yet)
-# TODO: fix this
-# USER node
-
 WORKDIR /app/nango
 
 # Code
-# COPY --from=build --chown=node:node /app/tmp /app/nango
 COPY --from=build /app/tmp /app/nango
 
 ARG git_hash
 
-ENV PORT=8080
+# Set Node.js memory limit for free tier (384MB to leave room for system)
+ENV NODE_OPTIONS="--max-old-space-size=384"
+ENV PORT=10000
 ENV NODE_ENV=production
 ENV GIT_HASH=$git_hash
 ENV SERVER_RUN_MODE=DOCKERIZED
 
-EXPOSE 8080
+EXPOSE 10000
 
+# Start command
 CMD ["npm", "run", "start", "-w", "@nangohq/nango-server"]
