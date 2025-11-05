@@ -7,6 +7,8 @@
     "typings": "dist/index.d.ts",
     "private": true,
     "scripts": {
+        "prebuild": "npm install typescript --save-dev",
+        "build": "tsc",
         "start": "tsc && node dist/server.js",
         "dev": "nodemon",
         "nango": "cd nango-integrations && node ../../cli/dist/index.js"
@@ -65,7 +67,8 @@
         "ua-parser-js": "2.0.2",
         "uuid": "9.0.0",
         "ws": "8.18.2",
-        "zod": "4.0.5"
+        "zod": "4.0.5",
+        "typescript": "5.8.3"
     },
     "devDependencies": {
         "@nangohq/types": "file:../types",
@@ -89,7 +92,6 @@
         "get-port": "7.1.0",
         "nodemon": "3.1.10",
         "type-fest": "4.41.0",
-        "typescript": "5.8.3",
         "vitest": "3.2.4"
     }
 }
