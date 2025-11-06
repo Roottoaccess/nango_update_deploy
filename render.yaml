@@ -25,10 +25,10 @@ services:
       # Auto-wire Postgres connection string from the managed database below
       - key: RECORDS_DATABASE_URL
         fromDatabase:
-          name: nango-db
+          name: nango-db1
           property: connectionString
 
 databases:
-  - name: nango-db
+  - name: nango-db1
     plan: free
 
