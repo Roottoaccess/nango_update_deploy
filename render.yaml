@@ -1,0 +1,34 @@
+services:
+  - type: web
+    name: nango-server
+    env: docker
+    plan: free
+    autoDeploy: true
+    # If deploying from GitHub, Render will auto-detect the Dockerfile at the repo root.
+    # If deploying from the dashboard manually, you can ignore the 'repo' field.
+    # repo: https://github.com/<your-org-or-user>/<your-repo>
+    envVars:
+      - key: SERVER_PORT
+        value: $PORT
+      - key: FLAG_SERVE_CONNECT_UI
+        value: "false"
+      - key: LOG_LEVEL
+        value: info
+      # Set this in the dashboard after first deploy: `openssl rand -base64 32`
+      - key: NANGO_ENCRYPTION_KEY
+        sync: false
+      # Set these to your Render service URL after first deploy
+      - key: NANGO_SERVER_URL
+        sync: false
+      - key: NANGO_PUBLIC_SERVER_URL
+        sync: false
+      # Auto-wire Postgres connection string from the managed database below
+      - key: RECORDS_DATABASE_URL
+        fromDatabase:
+          name: nango-db
+          property: connectionString
+
+databases:
+  - name: nango-db
+    plan: free
+
